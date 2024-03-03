@@ -33,32 +33,6 @@ impl SimpleState for Pong {
     }
 }
 
-#[derive(PartialEq, Eq)]
-pub enum Side {
-    Left,
-    Right,
-}
-
-pub struct Paddle {
-    pub side: Side,
-    pub width: f32,
-    pub height: f32,
-}
-
-impl Paddle {
-    fn new(side: Side) -> Paddle {
-        Paddle {
-            side,
-            width: PADDLE_WIDTH,
-            height: PADDLE_HEIGHT,
-        }
-    }
-}
-
-impl Component for Paddle {
-    type Storage = DenseVecStorage<Self>;
-}
-
 fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
@@ -95,6 +69,31 @@ fn initialise_camera(world: &mut World) {
 }
 
 /*  -----------------------------Initialises one paddle on the left, and one paddle on the right----------------------------- */
+#[derive(PartialEq, Eq)]
+pub enum Side {
+    Left,
+    Right,
+}
+
+pub struct Paddle {
+    pub side: Side,
+    pub width: f32,
+    pub height: f32,
+}
+
+impl Paddle {
+    fn new(side: Side) -> Paddle {
+        Paddle {
+            side,
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+        }
+    }
+}
+
+impl Component for Paddle {
+    type Storage = DenseVecStorage<Self>;
+}
 fn initialise_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut left_transform = Transform::default();
     let mut right_transform = Transform::default();
