@@ -1,3 +1,4 @@
+mod pong;
 use amethyst::{
     prelude::*,
     renderer::{
@@ -7,8 +8,8 @@ use amethyst::{
     },
     utils::application_root_dir,
 };
-pub struct Pong;
-impl SimpleState for Pong {}
+use pong::Pong;
+
 extern crate amethyst;
 use amethyst::prelude::*;
 fn main() -> amethyst::Result<()> {
