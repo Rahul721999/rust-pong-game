@@ -12,6 +12,10 @@ pub const ARENA_WIDTH: f32 = 100.0;
 pub const PADDLE_HEIGHT: f32 = 16.0;
 pub const PADDLE_WIDTH: f32 = 4.0;
 
+pub const BALL_VELOCITY_X: f32 = 75.0;
+pub const BALL_VELOCITY_Y: f32 = 75.0;
+pub const BALL_RADIUS: f32 = 2.0;
+
 pub struct Pong;
 
 impl SimpleState for Pong {
@@ -19,12 +23,11 @@ impl SimpleState for Pong {
         let world = data.world;
 
         // Load the spritesheet necessary to render the graphics.
-        // `spritesheet` is the layout of the sprites on the image;
-        // `texture` is the pixel data.
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        world.register::<Paddle>();
+        world.register::<Ball>();
 
+        initialise_ball(world, sprite_sheet_handle.clone());
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
     }
@@ -78,7 +81,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     )
 }
 
-/// Initialise the camera.
+/* ---------------------------------------Initialise the camera--------------------------------------- */
 fn initialise_camera(world: &mut World) {
     // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
     let mut transform = Transform::default();
@@ -91,7 +94,7 @@ fn initialise_camera(world: &mut World) {
         .build();
 }
 
-/// Initialises one paddle on the left, and one paddle on the right.
+/*  -----------------------------Initialises one paddle on the left, and one paddle on the right----------------------------- */
 fn initialise_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut left_transform = Transform::default();
     let mut right_transform = Transform::default();
@@ -118,5 +121,31 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet
         .with(sprite_render)
         .with(Paddle::new(Side::Right))
         .with(right_transform)
+        .build();
+}
+
+/* ---------------------------------initialising ball--------------------------------- */
+pub struct Ball{
+    pub velocity: [f32; 2],
+    pub radius: f32
+}
+
+impl Component for Ball{
+    type Storage = DenseVecStorage<Self>;
+}
+fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>){
+    let mut local_transform = Transform::default();
+    local_transform.set_translation_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
+
+    let sprite_render = SpriteRender::new(sprite_sheet_handle, 1);
+
+    world
+        .create_entity()
+        .with(sprite_render)
+        .with(Ball{
+            radius : BALL_RADIUS,
+            velocity : [BALL_VELOCITY_X, BALL_VELOCITY_Y],
+        })
+        .with(local_transform)
         .build();
 }
