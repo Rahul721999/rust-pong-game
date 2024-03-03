@@ -1,10 +1,8 @@
 use crate::pong::{Ball, Paddle, Side, ARENA_HEIGHT};
 use amethyst::{
-    core::{SystemDesc, Transform},
-    derive::SystemDesc,
-    ecs::{Join, ReadStorage, System, SystemData, World, WriteStorage},
+    core::Transform,
+    ecs::{Join, ReadStorage, System, WriteStorage},
 };
-
 pub struct BounceSystem;
 
 impl<'s> System<'s> for BounceSystem {
@@ -32,7 +30,7 @@ impl<'s> System<'s> for BounceSystem {
             // Bounce at the paddles.
             for (paddle, paddle_transform) in (&paddles, &transforms).join() {
                 let paddle_x = paddle_transform.translation().x - (paddle.width * 0.5);
-                let paddle_y = paddle_transform.translation().y - (paddle.width * 0.5);
+                let paddle_y = paddle_transform.translation().y - (paddle.height * 0.5);
 
                 // To determine whether the ball has collided with a paddle, we create a larger
                 // rectangle around the current one, by subtracting the ball radius from the
@@ -44,14 +42,12 @@ impl<'s> System<'s> for BounceSystem {
                     ball_y,
                     paddle_x - ball.radius,
                     paddle_y - ball.radius,
-                    paddle_x - paddle.width + ball.radius,
-                    paddle_y - paddle.height + ball.radius,
-                ) {
-                    if (paddle.side == Side::Left && ball.velocity[0] < 0.0)
-                        || (paddle.side == Side::Right && ball.velocity[1] > 0.0)
-                    {
-                        ball.velocity[0] = -ball.velocity[0];
-                    }
+                    paddle_x + (paddle.width + ball.radius),
+                    paddle_y + (paddle.height + ball.radius),
+                ) && ((paddle.side == Side::Left && ball.velocity[0] < 0.0)
+                    || (paddle.side == Side::Right && ball.velocity[1] > 0.0))
+                {
+                    ball.velocity[0] = -ball.velocity[0];
                 }
             }
         }
