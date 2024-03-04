@@ -3,7 +3,8 @@ use amethyst::{
     core::{timing::Time, transform::Transform},
     ecs::prelude::{Component, DenseVecStorage, Entity},
     prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture}, ui::{Anchor, LineMode, TtfFormat, UiText, UiTransform},
+    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    ui::{Anchor, LineMode, TtfFormat, UiText, UiTransform},
 };
 
 pub const ARENA_HEIGHT: f32 = 100.0;
@@ -17,13 +18,12 @@ pub const BALL_VELOCITY_Y: f32 = 25.0;
 pub const BALL_RADIUS: f32 = 2.0;
 
 #[derive(Default)]
-pub struct Pong{
+pub struct Pong {
     ball_spawn_timer: Option<f32>,
-    sprite_sheet_handle: Option<Handle<SpriteSheet>>
+    sprite_sheet_handle: Option<Handle<SpriteSheet>>,
 }
 
 impl SimpleState for Pong {
-    
     /// responsible to start the game
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
@@ -39,7 +39,7 @@ impl SimpleState for Pong {
         initialise_scoreboard(world);
     }
 
-    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans{
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         if let Some(mut timer) = self.ball_spawn_timer.take() {
             // If the timer isn't expired yet, substract the time that passed since last update.
             {
@@ -149,15 +149,15 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet
 }
 
 /* ---------------------------------initialising ball--------------------------------- */
-pub struct Ball{
+pub struct Ball {
     pub velocity: [f32; 2],
-    pub radius: f32
+    pub radius: f32,
 }
 
-impl Component for Ball{
+impl Component for Ball {
     type Storage = DenseVecStorage<Self>;
 }
-fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>){
+fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut local_transform = Transform::default();
     local_transform.set_translation_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
 
@@ -166,9 +166,9 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>){
     world
         .create_entity()
         .with(sprite_render)
-        .with(Ball{
-            radius : BALL_RADIUS,
-            velocity : [BALL_VELOCITY_X, BALL_VELOCITY_Y],
+        .with(Ball {
+            radius: BALL_RADIUS,
+            velocity: [BALL_VELOCITY_X, BALL_VELOCITY_Y],
         })
         .with(local_transform)
         .build();
@@ -176,17 +176,17 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>){
 
 /* ---------------------------------Score Borad--------------------------------- */
 #[derive(Default)]
-pub struct ScoreBorad{
+pub struct ScoreBorad {
     pub score_left: i32,
     pub score_right: i32,
 }
 
-pub struct ScoreText{
+pub struct ScoreText {
     pub p1_score: Entity,
     pub p2_score: Entity,
 }
 
-fn initialise_scoreboard(world: &mut World){
+fn initialise_scoreboard(world: &mut World) {
     let font = world.read_resource::<Loader>().load(
         "font/square.ttf",
         TtfFormat,
@@ -195,12 +195,24 @@ fn initialise_scoreboard(world: &mut World){
     );
 
     let p1_transform = UiTransform::new(
-        "p1".to_string(), Anchor::TopMiddle, Anchor::TopMiddle,
-        -50., -50., 1., 200., 50.,
+        "p1".to_string(),
+        Anchor::TopMiddle,
+        Anchor::TopMiddle,
+        -50.,
+        -50.,
+        1.,
+        200.,
+        50.,
     );
     let p2_transform = UiTransform::new(
-        "p1".to_string(), Anchor::TopMiddle, Anchor::TopMiddle,
-        -50., -50., 1., 200., 50.,
+        "p1".to_string(),
+        Anchor::TopMiddle,
+        Anchor::TopMiddle,
+        50.,
+        -50.,
+        1.,
+        200.,
+        50.,
     );
 
     let p1_score = world
@@ -209,7 +221,7 @@ fn initialise_scoreboard(world: &mut World){
         .with(UiText::new(
             font.clone(),
             "0".to_string(),
-            [1.,1.,1.,1.],
+            [1., 1., 1., 1.],
             50.,
             LineMode::Single,
             Anchor::Middle,
@@ -221,11 +233,11 @@ fn initialise_scoreboard(world: &mut World){
         .with(UiText::new(
             font.clone(),
             "0".to_string(),
-            [1.,1.,1.,1.],
+            [1., 1., 1., 1.],
             50.,
             LineMode::Single,
             Anchor::Middle,
         ))
         .build();
-    world.insert(ScoreText{p1_score, p2_score});
+    world.insert(ScoreText { p1_score, p2_score });
 }
